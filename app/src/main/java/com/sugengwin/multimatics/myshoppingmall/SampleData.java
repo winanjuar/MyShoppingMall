@@ -18,4 +18,15 @@ public class SampleData {
                     "http://bro.do/5624-product_page_default_2/ventura-el-full-black.jpg",
                     "Rp. 669.000"}
     };
+
+    public static String[] thumb = new String[]{
+            //"http://bro.do/6158-product_thumbnail_default/tambora-choco-tan-black-sole.jpg",
+            //"http://bro.do/6159-product_thumbnail_default/tambora-choco-tan-black-sole.jpg",
+            //"http://bro.do/6160-product_thumbnail_default/tambora-choco-tan-black-sole.jpg",
+            //"http://bro.do/6161-product_thumbnail_default/tambora-choco-tan-black-sole.jpg",
+            "http://bro.do/6158-product_page_default_2/tambora-choco-tan-black-sole.jpg",
+            "http://bro.do/5775-product_page_default_2/boots-vintage-brown-gumsole.jpg",
+            "http://bro.do/3066-product_page_default_2/nitro-canvas-navy-red-sole.jpg",
+            "http://bro.do/5624-product_page_default_2/ventura-el-full-black.jpg"
+    };
 }

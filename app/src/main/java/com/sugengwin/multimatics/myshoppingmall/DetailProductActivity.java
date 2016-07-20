@@ -1,9 +1,11 @@
 package com.sugengwin.multimatics.myshoppingmall;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,11 +14,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-public class DetailProductActivity extends AppCompatActivity {
+public class DetailProductActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView tvName, tvPrice, tvDesc;
     private Button btnAddToCart;
     private ImageView imgDetail;
     private Spinner spnSize;
+    private ImageView imgThumbA, imgThumbB, imgThumbC, imgThumbD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,15 @@ public class DetailProductActivity extends AppCompatActivity {
         imgDetail = (ImageView) findViewById(R.id.img_detail);
         spnSize = (Spinner) findViewById(R.id.spn_size);
         tvDesc = (TextView) findViewById(R.id.tv_desc);
+
+        imgThumbA = (ImageView) findViewById(R.id.img_thumb_a);
+        imgThumbB = (ImageView) findViewById(R.id.img_thumb_b);
+        imgThumbC = (ImageView) findViewById(R.id.img_thumb_c);
+        imgThumbD = (ImageView) findViewById(R.id.img_thumb_d);
+        imgThumbA.setOnClickListener(this);
+        imgThumbB.setOnClickListener(this);
+        imgThumbC.setOnClickListener(this);
+        imgThumbD.setOnClickListener(this);
 
         Product selectedProduct = getIntent().getParcelableExtra("product");
         tvName.setText(selectedProduct.getName());
@@ -59,6 +71,11 @@ public class DetailProductActivity extends AppCompatActivity {
                 "Outsole: Thermoplastic Rubber sole with Brodo Adventure deboss<br>" +
                 "Upper Stitch Down + High pressure cementing construction";
         tvDesc.setText(Html.fromHtml(desc));
+
+        Glide.with(DetailProductActivity.this).load(SampleData.thumb[0]).into(imgThumbA);
+        Glide.with(DetailProductActivity.this).load(SampleData.thumb[1]).into(imgThumbB);
+        Glide.with(DetailProductActivity.this).load(SampleData.thumb[2]).into(imgThumbC);
+        Glide.with(DetailProductActivity.this).load(SampleData.thumb[3]).into(imgThumbD);
     }
 
     @Override
@@ -67,5 +84,30 @@ public class DetailProductActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        String imageUrl = null;
+        switch (v.getId()) {
+            case R.id.img_thumb_a :
+                imageUrl = SampleData.thumb[0];
+                break;
+            case R.id.img_thumb_b :
+                imageUrl = SampleData.thumb[1];
+                break;
+            case R.id.img_thumb_c :
+                imageUrl = SampleData.thumb[2];
+                break;
+            case R.id.img_thumb_d :
+                imageUrl = SampleData.thumb[3];
+                break;
+            default :
+                imageUrl = null;
+                break;
+        }
+        if (imageUrl != null) {
+            Glide.with(DetailProductActivity.this).load(imageUrl).into(imgDetail);
+        }
     }
 }
