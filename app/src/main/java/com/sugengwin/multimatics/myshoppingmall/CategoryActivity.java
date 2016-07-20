@@ -7,9 +7,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
+public class CategoryActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
     private ListView lvCategory;
     private String[] categories = new String[] {
@@ -21,10 +20,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_category);
         getSupportActionBar().setTitle("Home");
 
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, categories);
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(CategoryActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, categories);
 
         lvCategory = (ListView) findViewById(R.id.lv_category);
         lvCategory.setAdapter(categoryAdapter);
@@ -35,8 +34,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //Toast.makeText(MainActivity.this, "Item clicked "+categories[position], Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(MainActivity.this, ProductActivity.class);
+        //Toast.makeText(CategoryActivity.this, "Item clicked "+categories[position], Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(CategoryActivity.this, ProductActivity.class);
         intent.putExtra("category", categories[position]);
         if (intent != null) {
             startActivity(intent);
