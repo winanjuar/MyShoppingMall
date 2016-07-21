@@ -16,9 +16,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.sugengwin.multimatics.myshoppingmall.api.request.GetAllProductsRequest;
+
+import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        GetAllProductsRequest.OnGetAllProductRequestListener,
+        AdapterView.OnItemClickListener {
+
+    private ListView lvItem;
+    private ProgressBar progressBar;
+
+    private ProductAdapter adapter;
+    private GetAllProductsRequest mGetAllProductsRequest;
+    private ArrayList<Product> listItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,14 +44,23 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        lvItem = (ListView) findViewById(R.id.lv_item);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar);
+
+        adapter = new ProductAdapter(HomeActivity.this);
+        listItem = new ArrayList<>();
+        adapter.setListItem(listItem);
+
+        lvItem.setAdapter(adapter);
+        lvItem.setOnItemClickListener(this);
+
+        mGetAllProductsRequest = new GetAllProductsRequest();
+        mGetAllProductsRequest.setOnGetAllProductRequestListener(this);
+
+        lvItem.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+
+        mGetAllProductsRequest.callApi();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -130,5 +156,29 @@ public class HomeActivity extends AppCompatActivity
                 })
                 .create();
         mAlertDialog.show();
+    }
+
+    @Override
+    public void onGetAllProductsSuccess(ArrayList<Product> listProduct) {
+        lvItem.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+
+        listItem.addAll(listProduct);
+        adapter.setListItem(listItem);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onGetAllProductsFailure(String errorMessage) {
+        progressBar.setVisibility(View.GONE);
+        Toast.makeText(HomeActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(HomeActivity.this, DetailProductActivity.class);
+        intent.putExtra("product", listItem.get(position));
+        startActivity(intent);
     }
 }
