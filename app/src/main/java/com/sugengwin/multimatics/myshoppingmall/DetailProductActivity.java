@@ -3,6 +3,7 @@ package com.sugengwin.multimatics.myshoppingmall;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,10 +12,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.sugengwin.multimatics.myshoppingmall.db.CartHelper;
+import com.sugengwin.multimatics.myshoppingmall.db.CartItem;
 
 import java.util.ArrayList;
+
+import io.realm.internal.TableOrView;
 
 public class DetailProductActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView tvName, tvPrice, tvDesc;
@@ -22,23 +28,39 @@ public class DetailProductActivity extends AppCompatActivity implements View.OnC
     private ImageView imgDetail;
     private Spinner spnSize;
     private ImageView imgThumbA, imgThumbB, imgThumbC, imgThumbD;
+
+    private TextView tvCart, tvTitle;
+    private ImageView imgCart;
+    private Toolbar toolbar;
+
     private int currentImagePosition = 0;
+    private CartHelper mCartHelper;
+
+    private Product selectedProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_product);
 
-        getSupportActionBar().setTitle("Detail Product");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         tvName = (TextView) findViewById(R.id.tv_name);
         tvPrice = (TextView) findViewById(R.id.tv_price);
         btnAddToCart = (Button) findViewById(R.id.btn_add_to_cart);
+        btnAddToCart.setOnClickListener(this);
         imgDetail = (ImageView) findViewById(R.id.img_detail);
         imgDetail.setOnClickListener(this);
         spnSize = (Spinner) findViewById(R.id.spn_size);
         tvDesc = (TextView) findViewById(R.id.tv_desc);
+
+        tvTitle = (TextView) findViewById(R.id.tv_title);
+        tvCart = (TextView) findViewById(R.id.tv_cart);
+        imgCart = (ImageView) findViewById(R.id.img_cart);
+        imgCart.setOnClickListener(this);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+        tvTitle.setText("Detail Produk");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         imgThumbA = (ImageView) findViewById(R.id.img_thumb_a);
         imgThumbB = (ImageView) findViewById(R.id.img_thumb_b);
@@ -49,7 +71,7 @@ public class DetailProductActivity extends AppCompatActivity implements View.OnC
         imgThumbC.setOnClickListener(this);
         imgThumbD.setOnClickListener(this);
 
-        Product selectedProduct = getIntent().getParcelableExtra("product");
+        selectedProduct = getIntent().getParcelableExtra("product");
         tvName.setText(selectedProduct.getName());
         tvPrice.setText(selectedProduct.getPrice());
         Glide.with(DetailProductActivity.this).load(selectedProduct.getImageUrl()).into(imgDetail);
@@ -80,6 +102,8 @@ public class DetailProductActivity extends AppCompatActivity implements View.OnC
         Glide.with(DetailProductActivity.this).load(SampleData.thumb[1]).into(imgThumbB);
         Glide.with(DetailProductActivity.this).load(SampleData.thumb[2]).into(imgThumbC);
         Glide.with(DetailProductActivity.this).load(SampleData.thumb[3]).into(imgThumbD);
+
+        mCartHelper = new CartHelper(DetailProductActivity.this);
     }
 
     @Override
@@ -120,12 +144,42 @@ public class DetailProductActivity extends AppCompatActivity implements View.OnC
                 mIntent.putExtra("position", currentImagePosition);
                 startActivity(mIntent);
                 break;
+            case R.id.btn_add_to_cart:
+                if (mCartHelper.isItemAlreadyExist((int) selectedProduct.getId())) {
+                    Toast.makeText(DetailProductActivity.this, "This product is already in cart", Toast.LENGTH_SHORT).show();
+                } else {
+                    mCartHelper.create((int) selectedProduct.getId(), selectedProduct.getName(), selectedProduct.getImageUrl(), 1, Double.parseDouble(selectedProduct.getPrice()));
+                    Toast.makeText(DetailProductActivity.this, "This product is successfully added", Toast.LENGTH_SHORT).show();
+                    updateCartQty();
+                }
+                break;
+            case R.id.img_cart:
+                Intent intent = new Intent(DetailProductActivity.this, CartActivity.class);
+                startActivity(intent);
             default:
                 imageUrl = null;
                 break;
         }
         if (imageUrl != null) {
             Glide.with(DetailProductActivity.this).load(imageUrl).into(imgDetail);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCartQty();
+    }
+
+    private void updateCartQty() {
+        ArrayList<CartItem> list = mCartHelper.getAll();
+        tvCart.setVisibility(View.GONE);
+        if (list != null) {
+            if (list.size() > 0) {
+                int cartQty = list.size();
+                tvCart.setVisibility(View.VISIBLE);
+                tvCart.setText(String.valueOf(cartQty));
+            }
         }
     }
 }

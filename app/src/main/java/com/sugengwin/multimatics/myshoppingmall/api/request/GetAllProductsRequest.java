@@ -8,6 +8,7 @@ import com.sugengwin.multimatics.myshoppingmall.api.BaseApi;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -19,7 +20,7 @@ public class GetAllProductsRequest extends BaseApi {
     private OnGetAllProductRequestListener onGetAllProductRequestListener;
     private AsyncHttpClient client;
 
-    public GetAllProductsRequest(){
+    public GetAllProductsRequest() {
         client = getHttpClient();
     }
 
@@ -82,6 +83,9 @@ public class GetAllProductsRequest extends BaseApi {
                         mProduct.setImageUrl(item.getString("img_url"));
                         mProduct.setName(item.getString("name"));
                         mProduct.setPrice(item.getString("price"));
+                        //double price = Double.parseDouble(item.getString("price"));
+                        //DecimalFormat formatter = new DecimalFormat("#.###,00");
+                        //mProduct.setPrice("Rp. " + formatter.format(price).toString());
                         list.add(mProduct);
                     }
                 } else {
@@ -98,6 +102,7 @@ public class GetAllProductsRequest extends BaseApi {
 
     public interface OnGetAllProductRequestListener {
         void onGetAllProductsSuccess(ArrayList<Product> listProduct);
+
         void onGetAllProductsFailure(String errorMessage);
     }
 }
